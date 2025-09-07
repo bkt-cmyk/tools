@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Allocation Simulator</title>
+
+    <!-- ===================== FONTS & STYLES ===================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------- BODY & HEADINGS ---------------- */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f4f8;
+            color: #1f2937;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 25px 0;
+            font-size: 28px;
+            color: #111827;
+        }
+
+        /* ---------------- MODAL INPUTS ---------------- */
+        .modal-content input[type="text"],
+        .modal-content input[type="number"] {
+            width: 70%;
+            max-width: 200px;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.25s ease-in-out;
+            background-color: #f9fafb;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        /* Hover effect */
+        .modal-content input[type="text"]:hover,
+        .modal-content input[type="number"]:hover {
+            border-color: #93c5fd;
+        }
+
+        /* Focus effect */
+        .modal-content input[type="text"]:focus,
+        .modal-content input[type="number"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: #ffffff;
+        }
+
+        /* Placeholder style */
+        .modal-content input::placeholder {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* ---------------- CARDS ---------------- */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 980px;
+        }
+
+        /* ---------------- INPUT GROUP ---------------- */
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .input-group input {
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .input-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+        }
+
+        /* ---------------- MODAL BUTTONS ---------------- */
+        .modal-buttons-input button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background .2s;
+        }
+
+        .modal-buttons-input button.add {
+            background: #16a34a;
+        }
+
+        .modal-buttons-input button.add:hover {
+            background: #15803d;
+        }
+
+        .modal-buttons-input button.clear {
+            background: #dc2626;
+        }
+
+        .modal-buttons-input button.clear:hover {
+            background: #b91c1c;
+        }
+
+        /* ---------------- TABLES ---------------- */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            min-width: 640px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: right;
+        }
+
+        th {
+            text-align: center;
+            background: #f3f4f6;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td:first-child,
+        th:first-child {
+            text-align: left;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        /* ---------------- HIGHLIGHT COLORS ---------------- */
+        .highlight-red {
+            background: #fecaca;
+        }
+
+        .highlight-yellow {
+            background: #fef08a;
+        }
+
+        .highlight-green {
+            background: #bbf7d0;
+        }
+
+        .highlight-blue {
+            background: #bfdbfe;
+        }
+
+        .highlight-purple {
+            background: #e9d5ff;
+        }
+
+        .highlight-orange {
+            background: #fed7aa;
+        }
+
+        .highlight-pink {
+            background: #fbcfe8;
+        }
+
+        .highlight-teal {
+            background: #99f6e4;
+        }
+
+        .highlight-gray {
+            background: #e5e7eb;
+        }
+
+        .highlight-brown {
+            background: #d6ccc2;
+        }
+
+        /* ---------------- MODALS ---------------- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .5);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn .3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fef3c7, #d9f99d);
+            padding: 28px;
+            border-radius: 16px;
+            width: 420px;
+            max-width: 92%;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #colorOptions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 12px 0;
+            gap: 8px;
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            transition: transform .15s, border .15s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.12);
+            border: 2px solid #000;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .12s;
+            border: none;
+            font-size: 15px;
+        }
+
+        .modal-buttons button.save {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .modal-buttons button.save:hover {
+            background: #2563eb;
+        }
+
+        .modal-buttons button.delete {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .modal-buttons button.delete:hover {
+            background: #C00907;
+        }
+
+        .modal-buttons button.cancel {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .modal-buttons button.cancel:hover {
+            background: #c9cacc;
+        }
+
+        /* ---------------- RESPONSIVE ---------------- */
+        @media(max-width:520px) {
+            .modal-content {
+                padding: 18px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            table {
+                min-width: 520px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===================== MAIN HEADING ===================== -->
+    <h2>📊 Portfolio Allocation Simulator</h2>
+
+    <!-- ===================== CASH INPUT CARD ===================== -->
+    <div class="card" style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+        <div class="input-group">
+            <label for="cashInput">Enter Cash ($):</label>
+            <input type="number" id="cashInput" min="0" step="1">
+            <div class="modal-buttons-input">
+                <button class="add">Add New Stock</button>
+                <button class="clear">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== ALLOCATION RESULT CARD ===================== -->
+    <div class="card">
+        <h3>Allocation Result</h3>
+        <div class="table-wrapper">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>Instrument</th>
+                        <th>Expected %</th>
+                        <th>Allocation ($)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== SIMULATION TABLE CARD ===================== -->
+    <div class="card">
+        <h3>Simulation Table</h3>
+        <div class="table-wrapper">
+            <table id="simulationTable">
+                <thead>
+                    <tr>
+                        <th>Instrument</th>
+                        <th data-percent="20" class="editable-sim" id="buy-1st">20%</th>
+                        <th data-percent="30" class="editable-sim" id="buy-2st">30%</th>
+                        <th data-percent="40" class="editable-sim" id="buy-3st">40%</th>
+                        <th data-percent="50" class="editable-sim" id="buy-4st">50%</th>
+                        <th data-percent="60" class="editable-sim" id="buy-5st">60%</th>
+                        <th data-percent="70" class="editable-sim" id="buy-6st">70%</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== MODALS ===================== -->
+    <!-- Edit Stock Modal -->
+    <div id="editModal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h3>Edit Stock</h3>
+            <input type="number" id="editPortion" min="0" step="0.1" placeholder="Expected %">
+            <div id="colorOptions">
+                <div class="color-option highlight-red" data-color="highlight-red" style="background:#fecaca"></div>
+                <div class="color-option highlight-yellow" data-color="highlight-yellow" style="background:#fef08a">
+                </div>
+                <div class="color-option highlight-green" data-color="highlight-green" style="background:#bbf7d0"></div>
+                <div class="color-option highlight-blue" data-color="highlight-blue" style="background:#bfdbfe"></div>
+                <div class="color-option highlight-purple" data-color="highlight-purple" style="background:#e9d5ff">
+                </div>
+                <div class="color-option highlight-orange" data-color="highlight-orange" style="background:#fed7aa">
+                </div>
+                <div class="color-option highlight-pink" data-color="highlight-pink" style="background:#fbcfe8"></div>
+                <div class="color-option highlight-teal" data-color="highlight-teal" style="background:#99f6e4"></div>
+                <div class="color-option highlight-gray" data-color="highlight-gray" style="background:#e5e7eb"></div>
+                <div class="color-option highlight-brown" data-color="highlight-brown" style="background:#d6ccc2"></div>
+            </div>
+            <div class="modal-buttons">
+                <button class="save">Save</button>
+                <button class="delete">Delete</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Stock Modal -->
+    <div id="addStockModal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAddStockModal()">×</button>
+            <h3>Add New Stock</h3>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                <div style="display:flex;flex-direction:column;flex:1 1 120px;">
+                    <label for="newStockName">Stock Name</label>
+                    <input type="text" id="newStockName" placeholder="e.g. MSFT">
+                </div>
+                <div style="display:flex;flex-direction:column;flex:1 1 120px;">
+                    <label for="newStockPortion">Expected %</label>
+                    <input type="number" id="newStockPortion" placeholder="%" min="0" step="0.1">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="save">Add</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Simulation Modal -->
+    <div id="editSimModal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSimModal()">×</button>
+            <h3>Edit Simulation Column (%)</h3>
+            <input type="number" id="editSimValue" placeholder="Percent (0-100)" min="0" max="100" step="0.01">
+            <div class="modal-buttons">
+                <button class="save">Save</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SCRIPT ===================== -->
+    <script>
+        /* ==== STORAGE & INITIALIZATION ==== */
+        const STORAGE_PORTFOLIO = 'STORAGE_PORTFOLIO';
+        let portfolio = {
+            cash: 0,
+            items: [],
+            simulationHeaders: []
+        };
+
+
+        if (!localStorage.getItem(STORAGE_PORTFOLIO)) {
+            // Ask permission only if storage doesn't exist
+            if (confirm("Do you allow this app to store portfolio data locally?")) {
+                portfolio = {
+                    cash: 0,
+                    items: [],
+                    simulationHeaders: [
+                        { label: "1st", percent: 20 },
+                        { label: "2st", percent: 30 },
+                        { label: "3st", percent: 40 },
+                        { label: "4st", percent: 50 },
+                        { label: "5st", percent: 60 },
+                        { label: "6st", percent: 70 }
+                    ]
+                };
+
+                const saveToStorage = () => localStorage.setItem(STORAGE_PORTFOLIO, JSON.stringify(portfolio));
+            } else {
+                // Redirect to a blank page if denied
+                window.location.href = 'about:blank';
+                exit()
+            }
+        } else {
+            // Storage already exists, load it directly
+            portfolio = JSON.parse(localStorage.getItem(STORAGE_PORTFOLIO));
+        }
+
+        let editingIndex = null, chosenColor = null, simEditingColIndex = null;
+
+        const cashInput = document.getElementById('cashInput'),
+            resultTbody = document.querySelector('#resultTable tbody'),
+            simTbody = document.querySelector('#simulationTable tbody'),
+            simHeaders = Array.from(document.querySelectorAll('#simulationTable thead th.editable-sim'));
+
+        cashInput.value = portfolio.cash || 0;
+
+        /* ==== HELPER FUNCTIONS ==== */
+        const saveToStorage = () => localStorage.setItem(STORAGE_PORTFOLIO, JSON.stringify(portfolio));
+        const totalPortion = () => portfolio.items.reduce((s, x) => s + (Number(x.portion) || 0), 0);
+        const formatCurrency = v => '$' + Number(v || 0).toFixed(2);
+
+        const computeAllocations = cash => portfolio.items.map(p => {
+            const expected = Number(p.portion) || 0;
+            return {
+                name: p.name,
+                expected,
+                color: p.color,
+                actualPercent: totalPortion() > 0 ? (expected / totalPortion()) * 100 : 0,
+                allocation: (cash * expected / 100),
+                darkened: p.darkened || []
+            };
+        });
+
+        /* ==== RENDER FUNCTIONS ==== */
+        function renderSimulationHeaders() {
+            const headerRow = document.getElementsByClassName("editable-sim");
+            Array.from(headerRow).forEach((th, index) => {
+                const newPercent = portfolio.simulationHeaders[index].percent;
+                th.dataset.percent = newPercent;
+                th.innerText = newPercent + '%';
+            });
+        }
+
+        const renderResultTable = cash => {
+            const html = computeAllocations(cash).map((a, i) =>
+                `<tr class="${a.color || ''}" data-index="${i}"><td>${a.name}</td><td>${a.expected.toFixed(2)}%</td><td>${formatCurrency(a.allocation)}</td></tr>`).join('');
+            resultTbody.innerHTML = html;
+            if (totalPortion() > 100) alert('Warning: total expected % exceeds 100%');
+        };
+
+        const renderSimulationTable = cash => {
+            const allocs = computeAllocations(cash);
+            simHeaders.forEach(th => { if (!th.dataset.percent) { const p = parseFloat(th.innerText.replace('%', '')) || 0; th.dataset.percent = p; th.innerText = p + '%'; } });
+            simTbody.innerHTML = allocs.map(a => {
+                let row = `<tr class="${a.color || ''}"><td>${a.name}</td>`;
+                simHeaders.forEach(th => {
+                    const p = Number(th.dataset.percent) || 0;
+                    const isDark = a.darkened.includes(p);
+                    row += `<td data-percent="${p}"${isDark ? ' data-darkened="true" style="background-color:rgba(0,0,0,.25);color:#fff"' : ''}>${formatCurrency(a.allocation * (p / 100))}</td>`;
+                });
+                return row + '</tr>';
+            }).join('');
+        };
+
+        const renderAll = () => {
+            const cash = Number(cashInput.value) || 0;
+            renderSimulationHeaders();
+            renderResultTable(cash);
+            renderSimulationTable(cash);
+            saveToStorage();
+        };
+
+        /* ==== MODAL HELPERS ==== */
+        const openModal = modal => modal.style.display = 'flex';
+        const closeModal = () => { document.getElementById('editModal').style.display = 'none'; editingIndex = null; chosenColor = null; };
+        const openAddStockModal = () => { document.getElementById('addStockModal').style.display = 'flex'; document.getElementById('newStockName').value = ''; document.getElementById('newStockPortion').value = ''; };
+        const closeAddStockModal = () => document.getElementById('addStockModal').style.display = 'none';
+        const openSimModal = (colIndex, currentPercent) => { simEditingColIndex = colIndex; document.getElementById('editSimValue').value = currentPercent; document.getElementById('editSimModal').style.display = 'flex'; };
+        const closeSimModal = () => { document.getElementById('editSimModal').style.display = 'none'; simEditingColIndex = null; };
+
+        /* ==== EVENT LISTENERS ==== */
+        document.querySelector('.clear').addEventListener('click', () => {
+            if (!confirm('Are you sure you want to clear all portfolio data?')) return;
+            portfolio = {
+                cash: 0,
+                items: [],
+                simulationHeaders: [
+                    { label: "1st", percent: 20 },
+                    { label: "2st", percent: 30 },
+                    { label: "3st", percent: 40 },
+                    { label: "4st", percent: 50 },
+                    { label: "5st", percent: 60 },
+                    { label: "6st", percent: 70 }
+                ]
+            };
+            cashInput.value = '';
+            closeModal();
+            closeAddStockModal();
+            closeSimModal();
+            renderAll();
+        });
+
+        document.querySelector('.add').addEventListener('click', openAddStockModal);
+
+        resultTbody.addEventListener('click', e => {
+            const tr = e.target.closest('tr'); if (!tr) return;
+            editingIndex = Number(tr.dataset.index); chosenColor = portfolio.items[editingIndex].color;
+            document.getElementById('editPortion').value = portfolio.items[editingIndex].portion;
+            openModal(document.getElementById('editModal'));
+        });
+
+        document.getElementById('colorOptions').addEventListener('click', e => { if (e.target.classList.contains('color-option')) chosenColor = e.target.dataset.color; });
+
+        function wireModal(modalId, saveCb, deleteCb) {
+            const modal = document.getElementById(modalId);
+            modal.querySelector('.save').onclick = saveCb;
+            modal.querySelector('.delete') && (modal.querySelector('.delete').onclick = deleteCb);
+            modal.querySelector('.cancel').onclick = () => modal.style.display = 'none';
+        }
+
+        wireModal('editModal', () => {
+            if (editingIndex == null) return;
+            const val = parseFloat(document.getElementById('editPortion').value) || 0;
+            portfolio.items[editingIndex].portion = val;
+            if (chosenColor) portfolio.items[editingIndex].color = chosenColor;
+            renderAll(); closeModal();
+        }, () => {
+            if (editingIndex == null) return;
+            if (confirm(`Delete ${portfolio.items[editingIndex].name}?`)) {
+                portfolio.items.splice(editingIndex, 1);
+                renderAll(); closeModal();
+            }
+        });
+
+        wireModal('addStockModal', () => {
+            const name = document.getElementById('newStockName').value.trim(); // get stock name
+            const portion = parseFloat(document.getElementById('newStockPortion').value); // get portion value
+
+            // Validate stock name
+            if (!name) return alert('Stock name cannot be empty');
+
+            // Validate portion value
+            if (isNaN(portion)) return alert('Portion must be a number');
+
+            // Check min/max range (0 < portion <= 100)
+            if (portion <= 0 || portion > 100) return alert('Portion must be greater than 0 and less than or equal to 100');
+
+            // Check for duplicate stock names (case-insensitive)
+            const exists = portfolio.items.some(item => item.name.toUpperCase() === name.toUpperCase());
+            if (exists) return alert('Stock name already exists!');
+
+            // Add new stock to portfolio
+            portfolio.items.push({
+                name: name.toUpperCase(),
+                portion,
+                color: 'highlight-gray',
+                darkened: []
+            });
+
+            renderAll(); // re-render tables
+            closeAddStockModal(); // close modal
+        });
+
+        simHeaders.forEach((th, idx) => th.addEventListener('click', () => {
+            const current = Number(th.dataset.percent) || parseFloat(th.innerText.replace('%', '')) || 0;
+            openSimModal(idx, current);
+        }));
+
+        wireModal('editSimModal', () => {
+            const raw = parseFloat(document.getElementById('editSimValue').value);
+            if (isNaN(raw) || raw < 0) return alert('Enter valid percent');
+            const th = simHeaders[simEditingColIndex]; if (!th) return closeSimModal();
+            th.dataset.percent = raw; th.innerText = raw + '%';
+            portfolio.simulationHeaders[simEditingColIndex].percent = raw;
+            renderSimulationTable(Number(cashInput.value) || 0); closeSimModal();
+            saveToStorage()
+        });
+
+        simTbody.addEventListener('click', e => {
+            const td = e.target.closest('td'); if (!td || !td.dataset.percent) return;
+            const tr = td.parentElement; const idx = Array.from(tr.parentElement.children).indexOf(tr);
+            const val = parseFloat(td.dataset.percent); const stock = portfolio.items[idx]; if (!stock) return;
+            if (!stock.darkened) stock.darkened = [];
+            if (stock.darkened.includes(val)) {
+                stock.darkened = stock.darkened.filter(x => x !== val); td.dataset.darkened = ''; td.style.background = ''; td.style.color = '';
+            } else {
+                stock.darkened.push(val); td.dataset.darkened = 'true'; td.style.background = 'rgba(0,0,0,.25)'; td.style.color = '#fff';
+            }
+            saveToStorage();
+        });
+
+        cashInput.addEventListener('input', () => {
+            portfolio.cash = Number(cashInput.value) || 0;
+            saveToStorage(); renderAll();
+        });
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeAddStockModal(); closeSimModal(); } });
+
+        renderAll();
+    </script>
+</body>
+
+</html>
