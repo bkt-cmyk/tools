@@ -1,0 +1,328 @@
+/* ---------------- BODY & HEADINGS ---------------- */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f0f4f8;
+    color: #1f2937;
+    min-width: 900px;
+}
+
+h2 {
+    text-align: center;
+    margin: 25px 0;
+    font-size: 28px;
+    color: #111827;
+}
+
+/* ---------------- MODAL INPUTS ---------------- */
+.modal-content input[type="text"],
+.modal-content input[type="number"] {
+    width: 70%;
+    max-width: 200px;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    background-color: #f9fafb;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+/* Hover effect */
+.modal-content input[type="text"]:hover,
+.modal-content input[type="number"]:hover {
+    border-color: #93c5fd;
+}
+
+/* Focus effect */
+.modal-content input[type="text"]:focus,
+.modal-content input[type="number"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background-color: #ffffff;
+}
+
+/* Placeholder style */
+.modal-content input::placeholder {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* ---------------- CARDS ---------------- */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 980px;
+}
+
+/* ---------------- INPUT GROUP ---------------- */
+.input-group {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.input-group label {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.input-group input {
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.input-group input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
+}
+
+/* ---------------- MODAL BUTTONS ---------------- */
+.modal-buttons-input button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background .2s;
+}
+
+.modal-buttons-input button.add {
+    background: #16a34a;
+}
+
+.modal-buttons-input button.add:hover {
+    background: #15803d;
+}
+
+.modal-buttons-input button.clear {
+    background: #dc2626;
+}
+
+.modal-buttons-input button.clear:hover {
+    background: #b91c1c;
+}
+
+/* ---------------- TABLES ---------------- */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    text-align: right;
+}
+
+th {
+    text-align: center;
+    background: #f3f4f6;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+td:first-child,
+th:first-child {
+    text-align: left;
+}
+
+tr:hover {
+    background: #f9fafb;
+}
+
+/* ---------------- HIGHLIGHT COLORS ---------------- */
+.highlight-red {
+    background: #fecaca;
+}
+
+.highlight-yellow {
+    background: #fef08a;
+}
+
+.highlight-green {
+    background: #bbf7d0;
+}
+
+.highlight-blue {
+    background: #bfdbfe;
+}
+
+.highlight-purple {
+    background: #e9d5ff;
+}
+
+.highlight-orange {
+    background: #fed7aa;
+}
+
+.highlight-pink {
+    background: #fbcfe8;
+}
+
+.highlight-teal {
+    background: #99f6e4;
+}
+
+.highlight-gray {
+    background: #e5e7eb;
+}
+
+.highlight-brown {
+    background: #d6ccc2;
+}
+
+/* ---------------- MODALS ---------------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn .3s ease;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #fef3c7, #d9f99d);
+    padding: 28px;
+    border-radius: 16px;
+    width: 420px;
+    max-width: 92%;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#colorOptions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 12px 0;
+    gap: 8px;
+}
+
+.color-option {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: transform .15s, border .15s;
+}
+
+.color-option:hover {
+    transform: scale(1.12);
+    border: 2px solid #000;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .12s;
+    border: none;
+    font-size: 15px;
+}
+
+.modal-buttons button.save {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.modal-buttons button.save:hover {
+    background: #2563eb;
+}
+
+.modal-buttons button.delete {
+    background: #dc2626;
+    color: #fff;
+}
+
+.modal-buttons button.delete:hover {
+    background: #C00907;
+}
+
+.modal-buttons button.cancel {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.modal-buttons button.cancel:hover {
+    background: #c9cacc;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media(max-width:520px) {
+    .modal-content {
+        padding: 18px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    table {
+        min-width: 520px;
+    }
+}
