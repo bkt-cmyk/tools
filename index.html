@@ -3,467 +3,223 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=900">
-    <title>Investment Allocation Calculator</title>
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Allocation Calculator | Portfolio Manager</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234F46E5'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1.81.45 1.61 1.67 1.61 1.16 0 1.6-.64 1.6-1.39 0-.93-.42-1.31-2.07-1.81-1.7-.52-3.47-1.33-3.47-3.65 0-1.94 1.34-3.07 3.04-3.37V4h2.67v2.06c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.63-1.44-1.63-1.06 0-1.46.66-1.46 1.35 0 .85.41 1.22 1.65 1.58 1.79.52 3.89 1.11 3.89 3.94 0 1.94-1.34 3.21-3.53 3.4z'/></svg>">
 
-    <!-- ===================== FONTS & STYLES ===================== -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        /* ---------------- BODY & HEADINGS ---------------- */
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f0f4f8;
-            color: #1f2937;
-            min-width: 900px;
-        }
 
-        h2 {
-            text-align: center;
-            margin: 25px 0;
-            font-size: 28px;
-            color: #111827;
-        }
-
-        /* ---------------- MODAL INPUTS ---------------- */
-        .modal-content input[type="text"],
-        .modal-content input[type="number"] {
-            width: 70%;
-            max-width: 200px;
-            padding: 12px 16px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            outline: none;
-            transition: all 0.25s ease-in-out;
-            background-color: #f9fafb;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        /* Hover effect */
-        .modal-content input[type="text"]:hover,
-        .modal-content input[type="number"]:hover {
-            border-color: #93c5fd;
-        }
-
-        /* Focus effect */
-        .modal-content input[type="text"]:focus,
-        .modal-content input[type="number"]:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-            background-color: #ffffff;
-        }
-
-        /* Placeholder style */
-        .modal-content input::placeholder {
-            color: #9ca3af;
-            font-style: italic;
-        }
-
-        /* ---------------- CARDS ---------------- */
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 980px;
-        }
-
-        /* ---------------- INPUT GROUP ---------------- */
-        .input-group {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .input-group label {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .input-group input {
-            padding: 12px 16px;
-            font-size: 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s;
-        }
-
-        .input-group input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, .2);
-        }
-
-        /* ---------------- MODAL BUTTONS ---------------- */
-        .modal-buttons-input button {
-            padding: 12px 24px;
-            font-size: 16px;
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background .2s;
-        }
-
-        .modal-buttons-input button.add {
-            background: #16a34a;
-        }
-
-        .modal-buttons-input button.add:hover {
-            background: #15803d;
-        }
-
-        .modal-buttons-input button.clear {
-            background: #dc2626;
-        }
-
-        .modal-buttons-input button.clear:hover {
-            background: #b91c1c;
-        }
-
-        /* ---------------- TABLES ---------------- */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            min-width: 640px;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            text-align: right;
-        }
-
-        th {
-            text-align: center;
-            background: #f3f4f6;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        td:first-child,
-        th:first-child {
-            text-align: left;
-        }
-
-        tr:hover {
-            background: #f9fafb;
-        }
-
-        /* ---------------- HIGHLIGHT COLORS ---------------- */
-        .highlight-red {
-            background: #fecaca;
-        }
-
-        .highlight-yellow {
-            background: #fef08a;
-        }
-
-        .highlight-green {
-            background: #bbf7d0;
-        }
-
-        .highlight-blue {
-            background: #bfdbfe;
-        }
-
-        .highlight-purple {
-            background: #e9d5ff;
-        }
-
-        .highlight-orange {
-            background: #fed7aa;
-        }
-
-        .highlight-pink {
-            background: #fbcfe8;
-        }
-
-        .highlight-teal {
-            background: #99f6e4;
-        }
-
-        .highlight-gray {
-            background: #e5e7eb;
-        }
-
-        .highlight-brown {
-            background: #d6ccc2;
-        }
-
-        /* ---------------- MODALS ---------------- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, .5);
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn .3s ease;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #fef3c7, #d9f99d);
-            padding: 28px;
-            border-radius: 16px;
-            width: 420px;
-            max-width: 92%;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            font-size: 18px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        #colorOptions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 12px 0;
-            gap: 8px;
-        }
-
-        .color-option {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-            transition: transform .15s, border .15s;
-        }
-
-        .color-option:hover {
-            transform: scale(1.12);
-            border: 2px solid #000;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .modal-buttons button {
-            flex: 1;
-            padding: 10px 0;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background .12s;
-            border: none;
-            font-size: 15px;
-        }
-
-        .modal-buttons button.save {
-            background: #3b82f6;
-            color: #fff;
-        }
-
-        .modal-buttons button.save:hover {
-            background: #2563eb;
-        }
-
-        .modal-buttons button.delete {
-            background: #dc2626;
-            color: #fff;
-        }
-
-        .modal-buttons button.delete:hover {
-            background: #C00907;
-        }
-
-        .modal-buttons button.cancel {
-            background: #e5e7eb;
-            color: #111827;
-        }
-
-        .modal-buttons button.cancel:hover {
-            background: #c9cacc;
-        }
-
-        /* ---------------- RESPONSIVE ---------------- */
-        @media(max-width:520px) {
-            .modal-content {
-                padding: 18px;
-            }
-
-            h2 {
-                font-size: 22px;
-            }
-
-            table {
-                min-width: 520px;
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <!-- ===================== MAIN HEADING ===================== -->
-    <h2>Investment Allocation Calculator</h2>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg id="theme-icon" viewBox="0 0 24 24">
+            <path
+                d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.591a.75.75 0 101.06 1.06l1.591-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.591-1.591a.75.75 0 10-1.06 1.06l1.591 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.591a.75.75 0 001.06 1.06l1.591-1.591zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06L6.166 5.106a.75.75 0 00-1.06 1.06l1.591 1.591z" />
+        </svg>
+    </button>
 
-    <!-- ===================== CASH INPUT CARD ===================== -->
-    <div class="card" style="display:flex;flex-direction:column;gap:16px;align-items:center;">
-        <div class="input-group">
-            <label for="cashInput">Enter Cash ($):</label>
-            <input type="number" id="cashInput" min="0" step="1">
-            <div class="modal-buttons-input">
-                <button class="add">Add New Stock</button>
-                <button class="clear">Clear</button>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Investment Allocation Calculator</h1>
+            <p>Smart portfolio management made simple</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalInvestment">$0</div>
+                <div class="stat-label">Total Investment</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10B981, #059669);">
+                <div class="stat-value" id="stockCount">0</div>
+                <div class="stat-label">Stocks</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                <div class="stat-value" id="totalAllocation">0%</div>
+                <div class="stat-label">Allocated</div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card">
+            <h2>Portfolio Setup</h2>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="cashInput">Investment Amount</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="cashInput" placeholder="10000" min="0" step="100">
+                    </div>
+                </div>
+                <div class="btn-group" style="align-self: flex-end;">
+                    <button class="btn btn-success" onclick="openAddModal()">
+                        <span>➕</span> Add Stock
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        <span>🗑️</span> Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Allocation -->
+        <div class="card">
+            <h2>Portfolio Allocation</h2>
+            <div id="portfolioList"></div>
+            <div class="chart-container">
+                <canvas id="allocationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Simulation Table -->
+        <div class="card">
+            <h2>Investment Scenarios</h2>
+            <div class="table-container">
+                <table id="simulationTable">
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th class="editable-sim" data-percent="20">20%</th>
+                            <th class="editable-sim" data-percent="30">30%</th>
+                            <th class="editable-sim" data-percent="40">40%</th>
+                            <th class="editable-sim" data-percent="50">50%</th>
+                            <th class="editable-sim" data-percent="60">60%</th>
+                            <th class="editable-sim" data-percent="70">70%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="empty-state">
+                            <td colspan="7">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z" />
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                                </svg>
+                                <h3>No stocks added yet</h3>
+                                <p>Add stocks to see simulation results</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+            <h2>Detailed Breakdown</h2>
+            <div class="table-container">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>Stock Symbol</th>
+                            <th>Target %</th>
+                            <th>Actual %</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="empty-state">
+                            <td colspan="5">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                </svg>
+                                <h3>No data available</h3>
+                                <p>Enter investment amount and add stocks to begin</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- ===================== ALLOCATION RESULT CARD ===================== -->
-    <div class="card">
-        <h3>Allocation Result</h3>
-        <div class="table-wrapper">
-            <table id="resultTable">
-                <thead>
-                    <tr>
-                        <th>Instrument</th>
-                        <th>Expected %</th>
-                        <th>Allocation ($)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ===================== SIMULATION TABLE CARD ===================== -->
-    <div class="card">
-        <h3>Simulation Table</h3>
-        <div class="table-wrapper">
-            <table id="simulationTable">
-                <thead>
-                    <tr>
-                        <th>Instrument</th>
-                        <th data-percent="20" class="editable-sim" id="buy-1st">20%</th>
-                        <th data-percent="30" class="editable-sim" id="buy-2st">30%</th>
-                        <th data-percent="40" class="editable-sim" id="buy-3st">40%</th>
-                        <th data-percent="50" class="editable-sim" id="buy-4st">50%</th>
-                        <th data-percent="60" class="editable-sim" id="buy-5st">60%</th>
-                        <th data-percent="70" class="editable-sim" id="buy-6st">70%</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ===================== MODALS ===================== -->
-    <!-- Edit Stock Modal -->
-    <div id="editModal" class="modal" role="dialog" aria-modal="true">
+    <!-- Add/Edit Stock Modal -->
+    <div id="stockModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
-            <h3>Edit Stock</h3>
-            <input type="number" id="editPortion" min="0" step="0.1" placeholder="Expected %">
-            <div id="colorOptions">
-                <div class="color-option highlight-red" data-color="highlight-red" style="background:#fecaca"></div>
-                <div class="color-option highlight-yellow" data-color="highlight-yellow" style="background:#fef08a">
-                </div>
-                <div class="color-option highlight-green" data-color="highlight-green" style="background:#bbf7d0"></div>
-                <div class="color-option highlight-blue" data-color="highlight-blue" style="background:#bfdbfe"></div>
-                <div class="color-option highlight-purple" data-color="highlight-purple" style="background:#e9d5ff">
-                </div>
-                <div class="color-option highlight-orange" data-color="highlight-orange" style="background:#fed7aa">
-                </div>
-                <div class="color-option highlight-pink" data-color="highlight-pink" style="background:#fbcfe8"></div>
-                <div class="color-option highlight-teal" data-color="highlight-teal" style="background:#99f6e4"></div>
-                <div class="color-option highlight-gray" data-color="highlight-gray" style="background:#e5e7eb"></div>
-                <div class="color-option highlight-brown" data-color="highlight-brown" style="background:#d6ccc2"></div>
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Stock</h3>
             </div>
-            <div class="modal-buttons">
-                <button class="save">Save</button>
-                <button class="delete">Delete</button>
-                <button class="cancel">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add New Stock Modal -->
-    <div id="addStockModal" class="modal" role="dialog" aria-modal="true">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeAddStockModal()">×</button>
-            <h3>Add New Stock</h3>
-            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-                <div style="display:flex;flex-direction:column;flex:1 1 120px;">
-                    <label for="newStockName">Stock Name</label>
-                    <input type="text" id="newStockName" placeholder="e.g. MSFT">
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label for="stockName">Stock Symbol</label>
+                    <input type="text" id="stockName" placeholder="e.g., AAPL, MSFT" maxlength="10">
                 </div>
-                <div style="display:flex;flex-direction:column;flex:1 1 120px;">
-                    <label for="newStockPortion">Expected %</label>
-                    <input type="number" id="newStockPortion" placeholder="%" min="0" step="0.1">
+                <div class="modal-field">
+                    <label for="stockPortion">Target Allocation (%)</label>
+                    <input type="number" id="stockPortion" placeholder="e.g., 25" min="0.01" max="100" step="0.01">
+                </div>
+                <div class="modal-field">
+                    <label>Choose Color</label>
+                    <div class="color-picker" id="colorPicker">
+                        <div class="color-option highlight-blue" data-color="highlight-blue"
+                            style="background: linear-gradient(135deg, #3B82F6, #2563EB);"></div>
+                        <div class="color-option highlight-green" data-color="highlight-green"
+                            style="background: linear-gradient(135deg, #10B981, #059669);"></div>
+                        <div class="color-option highlight-red" data-color="highlight-red"
+                            style="background: linear-gradient(135deg, #EF4444, #DC2626);"></div>
+                        <div class="color-option highlight-yellow" data-color="highlight-yellow"
+                            style="background: linear-gradient(135deg, #F59E0B, #D97706);"></div>
+                        <div class="color-option highlight-purple" data-color="highlight-purple"
+                            style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);"></div>
+                        <div class="color-option highlight-pink" data-color="highlight-pink"
+                            style="background: linear-gradient(135deg, #EC4899, #DB2777);"></div>
+                        <div class="color-option highlight-indigo" data-color="highlight-indigo"
+                            style="background: linear-gradient(135deg, #6366F1, #4F46E5);"></div>
+                        <div class="color-option highlight-teal" data-color="highlight-teal"
+                            style="background: linear-gradient(135deg, #14B8A6, #0D9488);"></div>
+                        <div class="color-option highlight-orange" data-color="highlight-orange"
+                            style="background: linear-gradient(135deg, #FB923C, #F97316);"></div>
+                        <div class="color-option highlight-gray" data-color="highlight-gray"
+                            style="background: linear-gradient(135deg, #9CA3AF, #6B7280);"></div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-buttons">
-                <button class="save">Add</button>
-                <button class="cancel">Cancel</button>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveStock()">Save</button>
+                <button class="btn btn-danger" id="deleteBtn" onclick="deleteStock()"
+                    style="display: none;">Delete</button>
+                <button class="btn" style="background: #E5E7EB; color: #1F2937;" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- Edit Simulation Modal -->
-    <div id="editSimModal" class="modal" role="dialog" aria-modal="true">
+    <div id="simModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeSimModal()">×</button>
-            <h3>Edit Simulation Column (%)</h3>
-            <input type="number" id="editSimValue" placeholder="Percent (0-100)" min="0" max="100" step="0.01">
-            <div class="modal-buttons">
-                <button class="save">Save</button>
-                <button class="cancel">Cancel</button>
+            <div class="modal-header">
+                <h3>Edit Scenario Percentage</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label for="simPercent">Scenario Percentage (%)</label>
+                    <input type="number" id="simPercent" placeholder="Enter percentage" min="0" max="100" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveSimulation()">Save</button>
+                <button class="btn" style="background: #E5E7EB; color: #1F2937;"
+                    onclick="closeSimModal()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- ===================== SCRIPT ===================== -->
+    <!-- JS -->
     <script src="assets/js/script.js"></script>
-
 </body>
 
 </html>

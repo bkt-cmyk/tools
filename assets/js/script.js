@@ -1,228 +1,474 @@
-/* ==== STORAGE & INITIALIZATION ==== */
-const STORAGE_PORTFOLIO = 'STORAGE_PORTFOLIO';
+/* =============== PORTFOLIO STATE MANAGEMENT =============== */
 let portfolio = {
     cash: 0,
     items: [],
-    simulationHeaders: []
+    simulationHeaders: [
+        { percent: 20 },
+        { percent: 30 },
+        { percent: 40 },
+        { percent: 50 },
+        { percent: 60 },
+        { percent: 70 }
+    ]
 };
 
+let chartInstance = null;
+let editingIndex = null;
+let selectedColor = 'highlight-blue';
+let editingSimIndex = null;
 
-if (!localStorage.getItem(STORAGE_PORTFOLIO)) {
-    // Ask permission only if storage doesn't exist
-    if (confirm("Do you allow this app to store portfolio data locally?")) {
+/* =============== LOCAL STORAGE MANAGEMENT =============== */
+const STORAGE_KEY = 'investmentPortfolio';
+const THEME_KEY = 'portfolioTheme';
+
+// Load portfolio from localStorage
+function loadPortfolio() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            portfolio = JSON.parse(saved);
+            document.getElementById('cashInput').value = portfolio.cash || '';
+        } catch (e) {
+            console.error('Failed to load portfolio:', e);
+        }
+    }
+}
+
+// Save portfolio to localStorage
+function savePortfolio() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolio));
+    } catch (e) {
+        console.error('Failed to save portfolio:', e);
+    }
+}
+
+/* =============== THEME MANAGEMENT =============== */
+function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem(THEME_KEY, newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+        icon.innerHTML = '<path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>';
+    } else {
+        icon.innerHTML = '<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.591a.75.75 0 101.06 1.06l1.591-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.591-1.591a.75.75 0 10-1.06 1.06l1.591 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.591a.75.75 0 001.06 1.06l1.591-1.591zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06L6.166 5.106a.75.75 0 00-1.06 1.06l1.591 1.591z"/>';
+    }
+}
+
+/* =============== CALCULATION FUNCTIONS =============== */
+function getTotalAllocation() {
+    return portfolio.items.reduce((sum, item) => sum + (parseFloat(item.portion) || 0), 0);
+}
+
+function calculateActualPercent(item) {
+    const total = getTotalAllocation();
+    return total > 0 ? (parseFloat(item.portion) / total) * 100 : 0;
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+}
+
+/* =============== MODAL MANAGEMENT =============== */
+function openAddModal() {
+    editingIndex = null;
+    document.getElementById('modalTitle').textContent = 'Add New Stock';
+    document.getElementById('stockName').value = '';
+    document.getElementById('stockName').disabled = false;
+    document.getElementById('stockPortion').value = '';
+    document.getElementById('deleteBtn').style.display = 'none';
+    selectedColor = 'highlight-blue';
+    updateColorSelection();
+    document.getElementById('stockModal').classList.add('show');
+}
+
+function openEditModal(index) {
+    editingIndex = index;
+    const item = portfolio.items[index];
+    document.getElementById('modalTitle').textContent = 'Edit Stock';
+    document.getElementById('stockName').value = item.name;
+    document.getElementById('stockName').disabled = true;
+    document.getElementById('stockPortion').value = item.portion;
+    document.getElementById('deleteBtn').style.display = 'inline-flex';
+    selectedColor = item.color || 'highlight-blue';
+    updateColorSelection();
+    document.getElementById('stockModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('stockModal').classList.remove('show');
+    editingIndex = null;
+}
+
+function openSimModal(index) {
+    editingSimIndex = index;
+    const header = portfolio.simulationHeaders[index];
+    document.getElementById('simPercent').value = header.percent;
+    document.getElementById('simModal').classList.add('show');
+}
+
+function closeSimModal() {
+    document.getElementById('simModal').classList.remove('show');
+    editingSimIndex = null;
+}
+
+/* =============== COLOR PICKER =============== */
+function updateColorSelection() {
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.dataset.color === selectedColor) {
+            option.classList.add('selected');
+        }
+    });
+}
+
+/* =============== CRUD OPERATIONS =============== */
+function saveStock() {
+    const name = document.getElementById('stockName').value.trim().toUpperCase();
+    const portion = parseFloat(document.getElementById('stockPortion').value);
+
+    // Validation
+    if (!name) {
+        alert('Please enter a stock symbol');
+        return;
+    }
+
+    if (isNaN(portion) || portion <= 0 || portion > 100) {
+        alert('Please enter a valid percentage between 0.01 and 100');
+        return;
+    }
+
+    // Check for duplicates (only when adding new)
+    if (editingIndex === null) {
+        const exists = portfolio.items.some(item => item.name === name);
+        if (exists) {
+            alert('This stock already exists in your portfolio');
+            return;
+        }
+    }
+
+    // Save stock
+    if (editingIndex !== null) {
+        portfolio.items[editingIndex].portion = portion;
+        portfolio.items[editingIndex].color = selectedColor;
+    } else {
+        portfolio.items.push({
+            name: name,
+            portion: portion,
+            color: selectedColor,
+            darkened: []
+        });
+    }
+
+    savePortfolio();
+    renderAll();
+    closeModal();
+}
+
+function deleteStock() {
+    if (editingIndex !== null && confirm('Are you sure you want to delete this stock?')) {
+        portfolio.items.splice(editingIndex, 1);
+        savePortfolio();
+        renderAll();
+        closeModal();
+    }
+}
+
+function saveSimulation() {
+    const percent = parseFloat(document.getElementById('simPercent').value);
+
+    if (isNaN(percent) || percent < 0 || percent > 100) {
+        alert('Please enter a valid percentage between 0 and 100');
+        return;
+    }
+
+    portfolio.simulationHeaders[editingSimIndex].percent = percent;
+    savePortfolio();
+    renderAll();
+    closeSimModal();
+}
+
+function clearAll() {
+    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
         portfolio = {
             cash: 0,
             items: [],
             simulationHeaders: [
-                { label: "1st", percent: 20 },
-                { label: "2st", percent: 30 },
-                { label: "3st", percent: 40 },
-                { label: "4st", percent: 50 },
-                { label: "5st", percent: 60 },
-                { label: "6st", percent: 70 }
+                { percent: 20 },
+                { percent: 30 },
+                { percent: 40 },
+                { percent: 50 },
+                { percent: 60 },
+                { percent: 70 }
             ]
         };
-
-        const saveToStorage = () => localStorage.setItem(STORAGE_PORTFOLIO, JSON.stringify(portfolio));
-    } else {
-        // Redirect to a blank page if denied
-        window.location.href = 'about:blank';
-        exit()
+        document.getElementById('cashInput').value = '';
+        savePortfolio();
+        renderAll();
     }
-} else {
-    // Storage already exists, load it directly
-    portfolio = JSON.parse(localStorage.getItem(STORAGE_PORTFOLIO));
 }
 
-let editingIndex = null, chosenColor = null, simEditingColIndex = null;
+/* =============== RENDERING FUNCTIONS =============== */
+function updateStats() {
+    const totalAllocation = getTotalAllocation();
+    document.getElementById('totalInvestment').textContent = formatCurrency(portfolio.cash);
+    document.getElementById('stockCount').textContent = portfolio.items.length;
+    document.getElementById('totalAllocation').textContent = totalAllocation.toFixed(1) + '%';
 
-const cashInput = document.getElementById('cashInput'),
-    resultTbody = document.querySelector('#resultTable tbody'),
-    simTbody = document.querySelector('#simulationTable tbody'),
-    simHeaders = Array.from(document.querySelectorAll('#simulationTable thead th.editable-sim'));
-
-cashInput.value = portfolio.cash || 0;
-
-/* ==== HELPER FUNCTIONS ==== */
-const saveToStorage = () => localStorage.setItem(STORAGE_PORTFOLIO, JSON.stringify(portfolio));
-const totalPortion = () => portfolio.items.reduce((s, x) => s + (Number(x.portion) || 0), 0);
-const formatCurrency = v => '$' + Number(v || 0).toFixed(2);
-
-const computeAllocations = cash => portfolio.items.map(p => {
-    const expected = Number(p.portion) || 0;
-    return {
-        name: p.name,
-        expected,
-        color: p.color,
-        actualPercent: totalPortion() > 0 ? (expected / totalPortion()) * 100 : 0,
-        allocation: (cash * expected / 100),
-        darkened: p.darkened || []
-    };
-});
-
-/* ==== RENDER FUNCTIONS ==== */
-function renderSimulationHeaders() {
-    const headerRow = document.getElementsByClassName("editable-sim");
-    Array.from(headerRow).forEach((th, index) => {
-        const newPercent = portfolio.simulationHeaders[index].percent;
-        th.dataset.percent = newPercent;
-        th.innerText = newPercent + '%';
-    });
+    // Update allocation card color based on percentage
+    const allocationCard = document.getElementById('totalAllocation').parentElement;
+    if (totalAllocation > 100) {
+        allocationCard.style.background = 'linear-gradient(135deg, #EF4444, #DC2626)';
+    } else if (totalAllocation === 100) {
+        allocationCard.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+    } else {
+        allocationCard.style.background = 'linear-gradient(135deg, #F59E0B, #D97706)';
+    }
 }
 
-const renderResultTable = cash => {
-    const html = computeAllocations(cash).map((a, i) =>
-        `<tr class="${a.color || ''}" data-index="${i}"><td>${a.name}</td><td>${a.expected.toFixed(2)}%</td><td>${formatCurrency(a.allocation)}</td></tr>`).join('');
-    resultTbody.innerHTML = html;
-    if (totalPortion() > 100) alert('Warning: total expected % exceeds 100%');
-};
+function renderPortfolioList() {
+    const container = document.getElementById('portfolioList');
 
-const renderSimulationTable = cash => {
-    const allocs = computeAllocations(cash);
-    simHeaders.forEach(th => { if (!th.dataset.percent) { const p = parseFloat(th.innerText.replace('%', '')) || 0; th.dataset.percent = p; th.innerText = p + '%'; } });
-    simTbody.innerHTML = allocs.map(a => {
-        let row = `<tr class="${a.color || ''}"><td>${a.name}</td>`;
-        simHeaders.forEach(th => {
-            const p = Number(th.dataset.percent) || 0;
-            const isDark = a.darkened.includes(p);
-            row += `<td data-percent="${p}"${isDark ? ' data-darkened="true" style="background-color:rgba(0,0,0,.25);color:#fff"' : ''}>${formatCurrency(a.allocation * (p / 100))}</td>`;
+    if (portfolio.items.length === 0) {
+        container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                        </svg>
+                        <h3>Your portfolio is empty</h3>
+                        <p>Click "Add Stock" to get started</p>
+                    </div>
+                `;
+        return;
+    }
+
+    container.innerHTML = portfolio.items.map((item, index) => `
+                <div class="portfolio-item ${item.color}" onclick="openEditModal(${index})">
+                    <div class="portfolio-item-name">${item.name}</div>
+                    <div class="portfolio-item-portion">${item.portion.toFixed(2)}%</div>
+                </div>
+            `).join('');
+}
+
+function renderResultTable() {
+    const tbody = document.querySelector('#resultTable tbody');
+
+    if (portfolio.items.length === 0 || portfolio.cash === 0) {
+        tbody.innerHTML = `
+                    <tr class="empty-state">
+                        <td colspan="5">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                            <h3>No data available</h3>
+                            <p>Enter investment amount and add stocks to begin</p>
+                        </td>
+                    </tr>
+                `;
+        return;
+    }
+
+    const totalAllocation = getTotalAllocation();
+
+    tbody.innerHTML = portfolio.items.map(item => {
+        const actualPercent = calculateActualPercent(item);
+        const amount = portfolio.cash * (item.portion / 100);
+        const status = totalAllocation > 100 ? '⚠️ Over-allocated' : '✅ OK';
+
+        return `
+                    <tr class="${item.color}">
+                        <td>${item.name}</td>
+                        <td>${item.portion.toFixed(2)}%</td>
+                        <td>${actualPercent.toFixed(2)}%</td>
+                        <td>${formatCurrency(amount)}</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
+    }).join('');
+}
+
+function renderSimulationTable() {
+    const thead = document.querySelector('#simulationTable thead tr');
+    const tbody = document.querySelector('#simulationTable tbody');
+
+    // Update headers
+    const headerHtml = '<th>Stock</th>' + portfolio.simulationHeaders.map((header, index) =>
+        `<th class="editable-sim" data-percent="${header.percent}" onclick="openSimModal(${index})">${header.percent}%</th>`
+    ).join('');
+    thead.innerHTML = headerHtml;
+
+    if (portfolio.items.length === 0 || portfolio.cash === 0) {
+        tbody.innerHTML = `
+                    <tr class="empty-state">
+                        <td colspan="7">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            </svg>
+                            <h3>No stocks added yet</h3>
+                            <p>Add stocks to see simulation results</p>
+                        </td>
+                    </tr>
+                `;
+        return;
+    }
+
+    tbody.innerHTML = portfolio.items.map(item => {
+        const baseAmount = portfolio.cash * (item.portion / 100);
+        let row = `<tr class="${item.color}"><td>${item.name}</td>`;
+
+        portfolio.simulationHeaders.forEach(header => {
+            const simAmount = baseAmount * (header.percent / 100);
+            const isDarkened = item.darkened && item.darkened.includes(header.percent);
+            row += `<td onclick="toggleDarkened('${item.name}', ${header.percent})" style="cursor: pointer; ${isDarkened ? 'filter: brightness(0.15);' : ''}">${formatCurrency(simAmount)}</td>`;
         });
+
         return row + '</tr>';
     }).join('');
-};
+}
 
-const renderAll = () => {
-    const cash = Number(cashInput.value) || 0;
-    renderSimulationHeaders();
-    renderResultTable(cash);
-    renderSimulationTable(cash);
-    saveToStorage();
-};
+function toggleDarkened(stockName, percent) {
+    const item = portfolio.items.find(i => i.name === stockName);
+    if (!item) return;
 
-/* ==== MODAL HELPERS ==== */
-const openModal = modal => modal.style.display = 'flex';
-const closeModal = () => { document.getElementById('editModal').style.display = 'none'; editingIndex = null; chosenColor = null; };
-const openAddStockModal = () => { document.getElementById('addStockModal').style.display = 'flex'; document.getElementById('newStockName').value = ''; document.getElementById('newStockPortion').value = ''; };
-const closeAddStockModal = () => document.getElementById('addStockModal').style.display = 'none';
-const openSimModal = (colIndex, currentPercent) => { simEditingColIndex = colIndex; document.getElementById('editSimValue').value = currentPercent; document.getElementById('editSimModal').style.display = 'flex'; };
-const closeSimModal = () => { document.getElementById('editSimModal').style.display = 'none'; simEditingColIndex = null; };
+    if (!item.darkened) item.darkened = [];
 
-/* ==== EVENT LISTENERS ==== */
-document.querySelector('.clear').addEventListener('click', () => {
-    if (!confirm('Are you sure you want to clear all portfolio data?')) return;
-    portfolio = {
-        cash: 0,
-        items: [],
-        simulationHeaders: [
-            { label: "1st", percent: 20 },
-            { label: "2st", percent: 30 },
-            { label: "3st", percent: 40 },
-            { label: "4st", percent: 50 },
-            { label: "5st", percent: 60 },
-            { label: "6st", percent: 70 }
-        ]
+    const index = item.darkened.indexOf(percent);
+    if (index > -1) {
+        item.darkened.splice(index, 1);
+    } else {
+        item.darkened.push(percent);
+    }
+
+    savePortfolio();
+    renderSimulationTable();
+}
+
+function updateChart() {
+    const ctx = document.getElementById('allocationChart');
+
+    if (portfolio.items.length === 0) {
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+        return;
+    }
+
+    const data = {
+        labels: portfolio.items.map(item => item.name),
+        datasets: [{
+            data: portfolio.items.map(item => item.portion),
+            backgroundColor: [
+                '#3B82F6', '#10B981', '#EF4444', '#F59E0B',
+                '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6',
+                '#FB923C', '#9CA3AF'
+            ],
+            borderWidth: 0
+        }]
     };
-    cashInput.value = '';
-    closeModal();
-    closeAddStockModal();
-    closeSimModal();
+
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const amount = portfolio.cash * (value / 100);
+                            return `${label}: ${value.toFixed(2)}% (${formatCurrency(amount)})`;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
+    chartInstance = new Chart(ctx, config);
+}
+
+function renderAll() {
+    updateStats();
+    renderPortfolioList();
+    renderResultTable();
+    renderSimulationTable();
+    updateChart();
+}
+
+/* =============== EVENT LISTENERS =============== */
+document.getElementById('cashInput').addEventListener('input', (e) => {
+    portfolio.cash = parseFloat(e.target.value) || 0;
+    savePortfolio();
     renderAll();
 });
 
-document.querySelector('.add').addEventListener('click', openAddStockModal);
-
-resultTbody.addEventListener('click', e => {
-    const tr = e.target.closest('tr'); if (!tr) return;
-    editingIndex = Number(tr.dataset.index); chosenColor = portfolio.items[editingIndex].color;
-    document.getElementById('editPortion').value = portfolio.items[editingIndex].portion;
-    openModal(document.getElementById('editModal'));
-});
-
-document.getElementById('colorOptions').addEventListener('click', e => { if (e.target.classList.contains('color-option')) chosenColor = e.target.dataset.color; });
-
-function wireModal(modalId, saveCb, deleteCb) {
-    const modal = document.getElementById(modalId);
-    modal.querySelector('.save').onclick = saveCb;
-    modal.querySelector('.delete') && (modal.querySelector('.delete').onclick = deleteCb);
-    modal.querySelector('.cancel').onclick = () => modal.style.display = 'none';
-}
-
-wireModal('editModal', () => {
-    if (editingIndex == null) return;
-    const val = parseFloat(document.getElementById('editPortion').value) || 0;
-    portfolio.items[editingIndex].portion = val;
-    if (chosenColor) portfolio.items[editingIndex].color = chosenColor;
-    renderAll(); closeModal();
-}, () => {
-    if (editingIndex == null) return;
-    if (confirm(`Delete ${portfolio.items[editingIndex].name}?`)) {
-        portfolio.items.splice(editingIndex, 1);
-        renderAll(); closeModal();
+document.getElementById('colorPicker').addEventListener('click', (e) => {
+    if (e.target.classList.contains('color-option')) {
+        selectedColor = e.target.dataset.color;
+        updateColorSelection();
     }
 });
 
-wireModal('addStockModal', () => {
-    const name = document.getElementById('newStockName').value.trim(); // get stock name
-    const portion = parseFloat(document.getElementById('newStockPortion').value); // get portion value
-
-    // Validate stock name
-    if (!name) return alert('Stock name cannot be empty');
-
-    // Validate portion value
-    if (isNaN(portion)) return alert('Portion must be a number');
-
-    // Check min/max range (0 < portion <= 100)
-    if (portion <= 0 || portion > 100) return alert('Portion must be greater than 0 and less than or equal to 100');
-
-    // Check for duplicate stock names (case-insensitive)
-    const exists = portfolio.items.some(item => item.name.toUpperCase() === name.toUpperCase());
-    if (exists) return alert('Stock name already exists!');
-
-    // Add new stock to portfolio
-    portfolio.items.push({
-        name: name.toUpperCase(),
-        portion,
-        color: 'highlight-gray',
-        darkened: []
-    });
-
-    renderAll(); // re-render tables
-    closeAddStockModal(); // close modal
-});
-
-simHeaders.forEach((th, idx) => th.addEventListener('click', () => {
-    const current = Number(th.dataset.percent) || parseFloat(th.innerText.replace('%', '')) || 0;
-    openSimModal(idx, current);
-}));
-
-wireModal('editSimModal', () => {
-    const raw = parseFloat(document.getElementById('editSimValue').value);
-    if (isNaN(raw) || raw < 0) return alert('Enter valid percent');
-    const th = simHeaders[simEditingColIndex]; if (!th) return closeSimModal();
-    th.dataset.percent = raw; th.innerText = raw + '%';
-    portfolio.simulationHeaders[simEditingColIndex].percent = raw;
-    renderSimulationTable(Number(cashInput.value) || 0); closeSimModal();
-    saveToStorage()
-});
-
-simTbody.addEventListener('click', e => {
-    const td = e.target.closest('td'); if (!td || !td.dataset.percent) return;
-    const tr = td.parentElement; const idx = Array.from(tr.parentElement.children).indexOf(tr);
-    const val = parseFloat(td.dataset.percent); const stock = portfolio.items[idx]; if (!stock) return;
-    if (!stock.darkened) stock.darkened = [];
-    if (stock.darkened.includes(val)) {
-        stock.darkened = stock.darkened.filter(x => x !== val); td.dataset.darkened = ''; td.style.background = ''; td.style.color = '';
-    } else {
-        stock.darkened.push(val); td.dataset.darkened = 'true'; td.style.background = 'rgba(0,0,0,.25)'; td.style.color = '#fff';
+// Close modals on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeModal();
+        closeSimModal();
     }
-    saveToStorage();
 });
 
-cashInput.addEventListener('input', () => {
-    portfolio.cash = Number(cashInput.value) || 0;
-    saveToStorage(); renderAll();
+// Close modals on outside click
+document.getElementById('stockModal').addEventListener('click', (e) => {
+    if (e.target.id === 'stockModal') {
+        closeModal();
+    }
 });
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeAddStockModal(); closeSimModal(); } });
+document.getElementById('simModal').addEventListener('click', (e) => {
+    if (e.target.id === 'simModal') {
+        closeSimModal();
+    }
+});
 
-renderAll();
+/* =============== INITIALIZATION =============== */
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    loadPortfolio();
+    renderAll();
+});
