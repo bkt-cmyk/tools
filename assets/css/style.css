@@ -20,13 +20,7 @@
 
 /* =============== DARK MODE =============== */
 [data-theme="dark"] {
-    --dark: #F9FAFB;
-    --gray: #D1D5DB;
-    --light-gray: #374151;
-    --white: #111827;
-    --shadow-sm: 0 1px 2px 0 rgb(255 255 255 / 0.05);
-    --shadow: 0 4px 6px -1px rgb(255 255 255 / 0.1);
-    --shadow-lg: 0 20px 25px -5px rgb(255 255 255 / 0.1);
+    --dark_bg: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #000000 100%);
 }
 
 /* =============== GLOBAL STYLES =============== */
@@ -38,12 +32,11 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--dark_bg);
     min-height: 100vh;
     color: var(--dark);
     position: relative;
     overflow-x: hidden;
-    /* width: 900px; */
 }
 
 body::before {
