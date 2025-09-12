@@ -3,12 +3,14 @@ let portfolio = {
     cash: 0,
     items: [],
     simulationHeaders: [
+        { percent: 10 },
         { percent: 20 },
         { percent: 30 },
         { percent: 40 },
         { percent: 50 },
         { percent: 60 },
-        { percent: 70 }
+        { percent: 70 },
+        { percent: 80 }
     ]
 };
 
@@ -211,12 +213,14 @@ function clearAll() {
             cash: 0,
             items: [],
             simulationHeaders: [
+                { percent: 10 },
                 { percent: 20 },
                 { percent: 30 },
                 { percent: 40 },
                 { percent: 50 },
                 { percent: 60 },
-                { percent: 70 }
+                { percent: 70 },
+                { percent: 80 }
             ]
         };
         document.getElementById('cashInput').value = '';
@@ -317,7 +321,7 @@ function renderSimulationTable() {
     if (portfolio.items.length === 0 || portfolio.cash === 0) {
         tbody.innerHTML = `
                     <tr class="empty-state">
-                        <td colspan="7">
+                        <td colspan="9">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M7 10l5 5 5-5z"/>
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
