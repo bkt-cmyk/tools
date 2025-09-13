@@ -8,8 +8,8 @@ InvestPro Suite is a web-based platform for serious investors. It provides advan
 
 ## 🛠 Available Tools
 
-### [Investment Allocation Calculator](investment-allocation-calculator/README.md)
+### [Investment Allocation Calculator](data/investment-allocation-calculator/README.md)
 - Plan, simulate, and summarize your stock investments efficiently.
 
-### [DCF Calculator](dcf-calculator/README.md)
+### [DCF Calculator](data/dcf-calculator/README.md)
 - Discounted Cash Flow analysis tool for intrinsic stock valuation. *(Coming Soon)*
