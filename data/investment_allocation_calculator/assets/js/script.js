@@ -470,6 +470,12 @@ document.getElementById('simModal').addEventListener('click', (e) => {
     }
 });
 
+/* =============== Copyright =============== */
+const footer = document.getElementById('footer');
+const year = new Date().getFullYear();
+const projectName = document.title || "My Project"; // Use page title
+footer.textContent = `© ${year} ${projectName}. All rights reserved.`;
+
 /* =============== INITIALIZATION =============== */
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();

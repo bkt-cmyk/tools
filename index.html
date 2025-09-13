@@ -5,309 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InvestPro Suite - Professional Investment Tools</title>
-    <style>
-        /* CSS Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #10b981;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --text-light: #9ca3af;
-            --bg: #ffffff;
-            --surface: #f9fafb;
-            --border: #e5e7eb;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
-            --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, .15);
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-            --space-xs: .5rem;
-            --space-sm: 1rem;
-            --space-md: 1.5rem;
-            --space-lg: 2rem;
-            --space-xl: 3rem;
-            --space-2xl: 4rem;
-            --radius-sm: 6px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-icon1: linear-gradient(135deg, #6366f1, #4f46e5);
-            --gradient-icon2: linear-gradient(135deg, #f59e0b, #d97706);
-        }
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
 
-        body {
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: var(--gradient-primary);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--space-md);
-        }
-
-        /* Header */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.75rem var(--space-md);
-            display: flex;
-            justify-content: center;
-        }
-
-        .header-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .logo-text {
-            white-space: nowrap;
-        }
-
-        .tagline {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 0.25rem;
-            text-align: center;
-        }
-
-        @media (min-width: 768px) {
-            .header-container {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .tagline {
-                margin-top: 0;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Main content */
-        .main {
-            padding: var(--space-2xl) 0;
-            min-height: calc(100vh - 200px);
-        }
-
-        .hero-section {
-            text-align: center;
-            margin-bottom: var(--space-2xl);
-        }
-
-        .hero-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 800;
-            color: white;
-            margin-bottom: var(--space-md);
-            line-height: 1.2;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, .3);
-        }
-
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, .9);
-            margin-bottom: var(--space-xl);
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        /* Tools Grid & Cards */
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: var(--space-lg);
-            margin-bottom: var(--space-2xl);
-        }
-
-        .tool-card {
-            background: rgba(255, 255, 255, .95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            padding: var(--space-xl);
-            border: 1px solid rgba(255, 255, 255, .3);
-            box-shadow: var(--shadow-lg);
-            transition: all .3s cubic-bezier(.4, 0, .2, 1);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            transform: translateX(-100%);
-            transition: transform .3s ease;
-        }
-
-        .tool-card:hover::before {
-            transform: translateX(0);
-        }
-
-        .tool-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
-            border-color: rgba(255, 255, 255, .5);
-        }
-
-        .tool-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: var(--space-md);
-            font-size: 2rem;
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
-        }
-
-        .tool-card:nth-child(1) .tool-icon {
-            background: var(--gradient-icon1);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, .3);
-        }
-
-        .tool-card:nth-child(2) .tool-icon {
-            background: var(--gradient-icon2);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, .3);
-        }
-
-        .tool-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: var(--space-sm);
-            color: var(--text-primary);
-        }
-
-        .tool-description {
-            color: var(--text-secondary);
-            margin-bottom: var(--space-md);
-            line-height: 1.6;
-        }
-
-        .launch-button {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-xs);
-            padding: var(--space-sm) var(--space-md);
-            background: var(--gradient-icon1);
-            color: white;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: .9rem;
-            cursor: pointer;
-            transition: all .2s ease;
-            text-decoration: none;
-        }
-
-        .launch-button::after {
-            content: '→';
-            transition: transform .2s ease;
-        }
-
-        .launch-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, .4);
-        }
-
-        .launch-button:hover::after {
-            transform: translateX(2px);
-        }
-
-        /* Footer */
-        .footer {
-            background: rgba(0, 0, 0, .2);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, .1);
-            padding: var(--space-lg) 0;
-            text-align: center;
-        }
-
-        .footer-text {
-            color: rgba(255, 255, 255, .7);
-            font-size: .9rem;
-        }
-
-        /* Responsive */
-        @media(max-width:768px) {
-            .container {
-                padding: 0 var(--space-sm);
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-
-            .tools-grid {
-                grid-template-columns: 1fr;
-                gap: var(--space-md);
-            }
-
-            .tool-card {
-                padding: var(--space-lg);
-            }
-        }
-
-        @media(max-width:480px) {
-            .hero-title {
-                font-size: 2rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <!-- Header -->
+    <!-- =======================
+         Header Section
+    ======================== -->
     <header class="header">
         <div class="container header-container">
             <a href="#" class="logo">
@@ -318,22 +25,30 @@
         </div>
     </header>
 
+    <!-- =======================
+         Main Section
+    ======================== -->
     <main class="main">
         <div class="container">
+            <!-- Hero Section -->
             <section class="hero-section">
                 <h1 class="hero-title">Master Your Investments</h1>
                 <p class="hero-subtitle">Advanced investment tools for serious investors. Analyze portfolios, optimize
                     allocations, and track performance with institutional-grade analytics.</p>
             </section>
 
+            <!-- Tools Grid -->
             <section class="tools-grid">
-                <a href="#" class="tool-card" data-tool="portfolio-analyzer">
+                <!-- Investment Allocation Calculator Tool -->
+                <a href="#" class="tool-card" data-tool="investment-allocation-calculator">
                     <div class="tool-icon">📊</div>
                     <h2 class="tool-title">Investment Allocation Calculator</h2>
-                    <p class="tool-description">Investment Allocation Calculator is a web app that lets users efficiently plan, simulate, and view summaries of their stock investments.</p>
-                    <span class="launch-button">Analyze Portfolio</span>
+                    <p class="tool-description">Investment Allocation Calculator is a web app that lets users
+                        efficiently plan, simulate, and view summaries of their stock investments.</p>
+                    <span class="launch-button">Go To</span>
                 </a>
 
+                <!-- DCF Calculator Tool -->
                 <a href="#" class="tool-card" data-tool="dcf-calculator">
                     <div class="tool-icon">⚖️</div>
                     <h2 class="tool-title">DCF Calculator</h2>
@@ -344,51 +59,15 @@
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2025 InvestPro Suite. Developed by bkt-cmyk.</p>
-        </div>
+    <!-- =======================
+         Footer Section
+    ======================== -->
+    <footer id="footer" style="text-align:center; padding:20px 0; background:#f3f4f6; color:#6b7280; font-size:0.9rem;">
     </footer>
 
-    <script>
-        class ToolHubApp {
-            constructor() {
-                this.init();
-            }
-            init() {
-                this.cacheElements();
-                this.setupListeners();
-            }
-            cacheElements() {
-                this.cards = document.querySelectorAll('.tool-card');
-                this.logo = document.querySelector('.logo');
-            }
-            setupListeners() {
-                this.cards.forEach(c => c.addEventListener('click', e => {
-                    e.preventDefault();
-                    this.navigateTo(c.dataset.tool)
-                }));
-                this.logo.addEventListener('click', e => {
-                    e.preventDefault();
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    })
-                });
-            }
-            navigateTo(tool) {
-                const paths = {
-                    'portfolio-analyzer': 'data/investment_allocation_calculator/index.html',
-                    'dcf-calculator': null
-                };
-                if (paths[tool]) window.location.href = paths[tool];
-                else alert('Tool coming soon!');
-            }
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            new ToolHubApp();
-        });
-    </script>
+    <!-- JS -->
+    <script src="assets/js/script.js"></script>
+
 </body>
 
 </html>
