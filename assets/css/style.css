@@ -176,6 +176,10 @@ body {
     cursor: pointer;
     color: inherit;
     text-decoration: none;
+
+    /* ✅ added for equal button alignment */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Gradient line on top of tool card */
@@ -238,12 +242,16 @@ body {
     color: var(--text-secondary);
     margin-bottom: var(--space-md);
     line-height: 1.6;
+
+    /* ✅ let description grow and push button down */
+    flex-grow: 1;
 }
 
 /* Launch button */
 .launch-button {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-xs);
     padding: var(--space-sm) var(--space-md);
     background: var(--gradient-icon1);
@@ -255,6 +263,9 @@ body {
     cursor: pointer;
     transition: all .2s ease;
     text-decoration: none;
+
+    /* ✅ button pinned at bottom */
+    margin-top: auto;
 }
 
 .launch-button::after {
