@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Allocation Calculator</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234F46E5'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1.81.45 1.61 1.67 1.61 1.16 0 1.6-.64 1.6-1.39 0-.93-.42-1.31-2.07-1.81-1.7-.52-3.47-1.33-3.47-3.65 0-1.94 1.34-3.07 3.04-3.37V4h2.67v2.06c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.63-1.44-1.63-1.06 0-1.46.66-1.46 1.35 0 .85.41 1.22 1.65 1.58 1.79.52 3.89 1.11 3.89 3.94 0 1.94-1.34 3.21-3.53 3.4z'/></svg>">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg id="theme-icon" viewBox="0 0 24 24">
+            <path
+                d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.591a.75.75 0 101.06 1.06l1.591-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.591-1.591a.75.75 0 10-1.06 1.06l1.591 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.591a.75.75 0 001.06 1.06l1.591-1.591zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06L6.166 5.106a.75.75 0 00-1.06 1.06l1.591 1.591z" />
+        </svg>
+    </button>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Investment Allocation Calculator</h1>
+            <p>Smart portfolio management made simple</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalInvestment">$0</div>
+                <div class="stat-label">Total Investment</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10B981, #059669);">
+                <div class="stat-value" id="stockCount">0</div>
+                <div class="stat-label">Stocks</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                <div class="stat-value" id="totalAllocation">0%</div>
+                <div class="stat-label">Allocated</div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card">
+            <h2>Portfolio Setup</h2>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="cashInput">Investment Amount</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="cashInput" placeholder="10000" min="0" step="100">
+                    </div>
+                </div>
+                <div class="btn-group" style="align-self: flex-end;">
+                    <button class="btn btn-success" onclick="openAddModal()">
+                        <span>➕</span> Add Stock
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        <span>🗑️</span> Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Allocation -->
+        <div class="card">
+            <h2>Portfolio Allocation</h2>
+            <div id="portfolioList"></div>
+            <div class="chart-container">
+                <canvas id="allocationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Simulation Table -->
+        <div class="card">
+            <h2>Investment Scenarios</h2>
+            <div class="table-container">
+                <table id="simulationTable">
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th class="editable-sim" data-percent="10">10%</th>
+                            <th class="editable-sim" data-percent="20">20%</th>
+                            <th class="editable-sim" data-percent="30">30%</th>
+                            <th class="editable-sim" data-percent="40">40%</th>
+                            <th class="editable-sim" data-percent="50">50%</th>
+                            <th class="editable-sim" data-percent="60">60%</th>
+                            <th class="editable-sim" data-percent="70">70%</th>
+                            <th class="editable-sim" data-percent="80">80%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="empty-state">
+                            <td colspan="9">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z" />
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                                </svg>
+                                <h3>No stocks added yet</h3>
+                                <p>Add stocks to see simulation results</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+            <h2>Detailed Breakdown</h2>
+            <div class="table-container">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>Stock Symbol</th>
+                            <th>Target %</th>
+                            <th>Actual %</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="empty-state">
+                            <td colspan="5">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                                </svg>
+                                <h3>No data available</h3>
+                                <p>Enter investment amount and add stocks to begin</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Stock Modal -->
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Stock</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label for="stockName">Stock Symbol</label>
+                    <input type="text" id="stockName" placeholder="e.g., AAPL, MSFT" maxlength="10">
+                </div>
+                <div class="modal-field">
+                    <label for="stockPortion">Target Allocation (%)</label>
+                    <input type="number" id="stockPortion" placeholder="e.g., 25" min="0.01" max="100" step="0.01">
+                </div>
+                <div class="modal-field">
+                    <label>Choose Color</label>
+                    <div class="color-picker" id="colorPicker">
+                        <div class="color-option highlight-blue" data-color="highlight-blue"
+                            style="background: linear-gradient(135deg, #3B82F6, #2563EB);"></div>
+                        <div class="color-option highlight-green" data-color="highlight-green"
+                            style="background: linear-gradient(135deg, #10B981, #059669);"></div>
+                        <div class="color-option highlight-red" data-color="highlight-red"
+                            style="background: linear-gradient(135deg, #EF4444, #DC2626);"></div>
+                        <div class="color-option highlight-yellow" data-color="highlight-yellow"
+                            style="background: linear-gradient(135deg, #F59E0B, #D97706);"></div>
+                        <div class="color-option highlight-purple" data-color="highlight-purple"
+                            style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);"></div>
+                        <div class="color-option highlight-pink" data-color="highlight-pink"
+                            style="background: linear-gradient(135deg, #EC4899, #DB2777);"></div>
+                        <div class="color-option highlight-indigo" data-color="highlight-indigo"
+                            style="background: linear-gradient(135deg, #6366F1, #4F46E5);"></div>
+                        <div class="color-option highlight-teal" data-color="highlight-teal"
+                            style="background: linear-gradient(135deg, #14B8A6, #0D9488);"></div>
+                        <div class="color-option highlight-orange" data-color="highlight-orange"
+                            style="background: linear-gradient(135deg, #FB923C, #F97316);"></div>
+                        <div class="color-option highlight-gray" data-color="highlight-gray"
+                            style="background: linear-gradient(135deg, #9CA3AF, #6B7280);"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveStock()">Save</button>
+                <button class="btn btn-danger" id="deleteBtn" onclick="deleteStock()"
+                    style="display: none;">Delete</button>
+                <button class="btn" style="background: #E5E7EB; color: #1F2937;" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Simulation Modal -->
+    <div id="simModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSimModal()">×</button>
+            <div class="modal-header">
+                <h3>Edit Scenario Percentage</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label for="simPercent">Scenario Percentage (%)</label>
+                    <input type="number" id="simPercent" placeholder="Enter percentage" min="0" max="100" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveSimulation()">Save</button>
+                <button class="btn" style="background: #E5E7EB; color: #1F2937;"
+                    onclick="closeSimModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>
